@@ -98,7 +98,7 @@ class bipalRobot(object):
         #plot trajectory in 3D
         if plot:
             plt.figure('single support trajectory',clear=True)
-            fig = plt.figure('single support trajectory',figsize=(10,8))
+            fig = plt.figure('single support trajectory',figsize=(100,100))
             ax = fig.add_subplot(projection='3d')
             plt.cla()
             ax.plot([p[0] for p in self.DCM_Traj],
@@ -120,8 +120,12 @@ class bipalRobot(object):
                         [p[2] for p in DCM_key], color='blue') #DCM key points
 
             ax.set_xlabel('X(m)'); ax.set_ylabel('Y(m)'); ax.set_zlabel('Z(m)') #axis label
-            plt.xlim([-1.5,1.5]); plt.ylim([0,3]) #axis scale
+
+            lenth=np.abs(footPs[-1][1]-footPs[0][1]); 
+            plt.xlim([-lenth/2,lenth/2]); plt.ylim([footPs[0][1],footPs[-1][1]]) #axis scale
+
             ax.set_title('Robot Trajetory(DCM,COM) [$t_{step,i}=%.2f(s)$]' % timePS_SS) #set title
+
             text = 'total time=%.2f(s)' % (self.timeSqu[-1])
             ax.text2D(0.8, 0, text, color='red', transform=ax.transAxes) #text: total time
 
@@ -178,10 +182,10 @@ class bipalRobot(object):
 if __name__=="__main__":
     robot = bipalRobot(80)
     footSteps = [[-0.2, 0.0, 0.0],
-                [0.2, 0.5, 0.0],
-                [-0.2, 0.5*2, 0.0],
-                [0.2, 0.5*3, 0.0],
-                [-0.2, 0.5*4, 0.0],
-                [0.2, 0.5*5, 0.0]]
+                [0.2, 0.8, 0.0],
+                [-0.2, 0.8*2, 0.0],
+                [0.2, 0.8*3, 0.0],
+                [-0.2, 0.8*4, 0.0],
+                [0.2, 0.8*5, 0.0]]
     initialCOM = [0.0, 0.0, 1]
     robot.DCM_PlannerSS(initialCOM, footSteps, 0.6) #single support test
