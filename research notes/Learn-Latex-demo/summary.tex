@@ -1,0 +1,38 @@
+%导言区
+\documentclass{ctexart}
+
+%导入配置
+\include{basic_setup.tex}
+
+%标题页
+\title{双足人形机器人论文调研与复现}
+\author{汤凯}
+\date{\today}
+
+%正文
+\begin{document}
+    \maketitle
+    本文将对几篇关于人形机器人行走与步态规划控制论文进行总结与复现。
+
+    \input{contents/section1.tex}
+    \input{contents/section2.tex}
+    
+    \bibliography{reference} %参考文献列举
+\end{document}
+
+% \begin{table}[h] %table浮动体
+%     \centering
+%     \caption{} \label{tab1-1}
+%     \begin{tabular}{l | c | c | r} 
+%         \hline
+%         1 & sad & sax & wd\\
+%         \hline
+%         2 & 2 & 3 & 4\\
+%     \end{tabular}
+% \end{table}
+
+% \begin{figure}[htbp] %figure浮动体
+%     \centering
+%     \includegraphics[scale=0.8]{}
+%     \caption{} \label{fig1-1}
+% \end{figure}
