@@ -1,4 +1,4 @@
-\section{基于DCM的双足（人形）机器人行走轨迹生成}
+\section{基于DCM的双足（人形）机器人行走轨迹生成与控制}
     该章主要根据文献\cite{englsbergerThreedimensionalBipedalWalking2013}的内容进行重新整理和复现，下面介绍相关内容。
     \subsection{DCM基本动力学方程的推导与几种特征点的定义}
         \subsubsection{DCM（运动发散量）的定义}
@@ -136,5 +136,93 @@
                 \caption{复现单点支撑DCM轨迹规划图} \label{fig2-4}
             \end{figure}
         \subsubsection{连续双点支撑DS（Double Support）情形}
-            
+            由式\eqref{equ2-7}可知$\boldsymbol{r}_{vrp}$可由DCM表示：
+            \begin{equation}
+                \boldsymbol{r}_{vrp}=\boldsymbol{\xi }-\sqrt{\frac{\varDelta z_{vrp}}{g}}\boldsymbol{\dot{\xi}}
+                \label{equ2-13}
+            \end{equation}
+            若DCM轨迹连续则VRP轨迹连续，并可进一步得到连续的外力，因此可在DCM的折点附近定义两个点用于插值，且DCM处于此两点之间时机器人处于双足支撑状态，
+            即两个单点支撑状态间的均匀过渡，支点CoP、eCMP随VRP的连续运动也连续变化。单步DCM折点附近双足支撑的起始点定义为$\boldsymbol{\xi}_{iniDS,i}$，
+            终止点定义为$\boldsymbol{\xi}_{eoDS,i}$，单步时起点到折点的时间为$\varDelta t_{DS,ini}$,起点到折点的时间为$\varDelta t_{DS,end}$其过程
+            示意图为图\ref{fig2-5}，且两者及其对应速度可由如下公式计算：
+            \begin{subequations}
+                \begin{align}
+                    \boldsymbol{\xi }_{iniDS,i}&=\boldsymbol{r}_{vrp,i-1}+e^{-\sqrt{\frac{g}{\varDelta z_{vrp}}}\varDelta t_{DS,ini}}\left( \boldsymbol{\xi }_{ini,i}-\boldsymbol{r}_{vrp,i-1} \right) 
+                    \label{equ2-14a}\\
+                    \boldsymbol{\xi }_{eoDS,i}&=\boldsymbol{r}_{vrp,i}+e^{\sqrt{\frac{g}{\varDelta z_{vrp}}}\varDelta t_{DS,end}}\left( \boldsymbol{\xi }_{ini,i}-\boldsymbol{r}_{vrp,i} \right) 
+                    \label{equ2-14b}\\
+                    \boldsymbol{\dot{\xi}}_{iniDS,i}&=\sqrt{\frac{g}{\varDelta z_{vrp}}}e^{-\sqrt{\frac{g}{\varDelta z_{vrp}}}\varDelta t_{DS,ini}}\left( \boldsymbol{\xi }_{ini,i}-\boldsymbol{r}_{vrp,i-1} \right) 
+                    \label{equ2-14c}\\
+                    \boldsymbol{\dot{\xi}}_{eoDS,i}&=\sqrt{\frac{g}{\varDelta z_{vrp}}}e^{\sqrt{\frac{g}{\varDelta z_{vrp}}}\varDelta t_{DS,end}}\left( \boldsymbol{\xi }_{ini,i}-\boldsymbol{r}_{vrp,i} \right) 
+                    \label{equ2-14d}
+                \end{align}
+            \end{subequations}
+            \begin{figure}[h] 
+                \centering
+                \includegraphics[scale=0.6]{2021-08-21-23-07-46.png}
+                \caption{双点支撑DCM轨迹规划示意图} \label{fig2-5}
+            \end{figure}
+
+            双足支撑的起点$\boldsymbol{\xi}_{iniDS,i}$与终止点$\boldsymbol{\xi}_{eoDS,i}$之间的轨迹点可用三次多项式插值产生，给定位置与速度的4个边界条件，按以下公式计算：
+            \begin{subequations}
+                \begin{align}
+                    \boldsymbol{P} = \left[
+                    \begin{matrix}
+                        2/{T_s}^3&		1/{T_s}^2&		-2/{T_s}^3&		1/{T_s}^2\\
+                        -3/{T_s}^2&		-2/T_s&		3/{T_s}^2&		-1/T_s\\
+                        0&		1&		0&		0\\
+                        1&		0&		0&		0\\
+                    \end{matrix} \right] \left[ 
+                    \begin{array}{c}
+                        \xi _{ini}^{T}\\
+                        \dot{\xi}_{ini}^{T}\\
+                        \xi _{end}^{T}\\
+                        \dot{\xi}_{end}^{T}\\
+                    \end{array} \right] 
+                    \label{equ2-15a}\\
+                    \left[ \begin{array}{c}
+                        \boldsymbol{\xi }^T\left( t \right)\\
+                        \boldsymbol{\dot{\xi}}^T\left( t \right)\\
+                    \end{array} \right] =\left[ \begin{matrix}
+                        t^3&		t^2&		t&		1\\
+                        3t^2&		2t&		1&		0\\
+                    \end{matrix} \right] \boldsymbol{P}
+                    \label{equ2-15b}
+                \end{align}
+            \end{subequations}
+
+            设定好相关参数后，用Python编写双足支撑下的CoM、DCM规划程序，自定义六个落脚点以及初始CoM位置并进行规划，规划结果与相关参数如下图\ref{fig2-6}所示，
+            其中$\varDelta t_{DS,ini,i}=\alpha\varDelta t_{DS,i}$、$\varDelta t_{DS,end,i}=(1-\alpha)\varDelta t_{DS,i}$。
+            \begin{figure}[ht] 
+                \centering
+                \includegraphics[scale=0.5]{DCM_DS.eps}
+                \caption{复现双点支撑DCM轨迹规划图} \label{fig2-6}
+            \end{figure}
+        \subsubsection{连续足跟-足尖运动支撑切换HT（Heel to Toe）情形}
+            上一小节中讨论的双足支撑机器人的脚固定在地面，为使机器人在双足支撑时的运动尽可能避开奇异构型并与人更为类似，现考虑加入足跟到足尖与足尖到足跟的连续支撑点切换。
+            该动作可扩大机器人单步运动的行程与范围，但在足尖与脚跟切换时其支撑多边形范围会变小。采用该动作时的轨迹示意图如下图\ref{fig2-7}所示，将单步时间$t_{step,i}$
+            拆分为足跟到足尖支撑时间$\varDelta t_{HT}=\alpha_{HT}t_{step,i}$与足尖到足跟支撑时间$\varDelta t_{TH}=(1-\alpha_{HT})t_{step,i}$并可采用2.2.1单点支撑后向递推
+            的方法算出各个DCM节点$\boldsymbol{\xi}_{ini,HT,i}$与$\boldsymbol{\xi}_{ini,TH,i}$，在每个脚跟DCM节点$\boldsymbol{\xi}_{ini,HT,i}$附近用上一小节式\eqref{equ2-14a}到\eqref{equ2-14d}的方法计算出双足
+            支撑的DCM起始点与、终止点及其速度。
+            \begin{figure}[h] 
+                \centering
+                \includegraphics[scale=0.6]{2021-08-24-14-28-10.png}
+                \caption{足跟-足尖支撑DCM轨迹规划示意图} \label{fig2-7}
+            \end{figure}
+
+            对该方法的复现结果与相关参数如下图\ref{fig2-8}所示，其中开始时$\boldsymbol{\xi}_{ini,HT,1}$到$\boldsymbol{\xi}_{eoDS,1}$的DCM轨迹与末尾$\boldsymbol{\xi}_{eoDS,end}$到$\boldsymbol{r}_{vrp,end}$的DCM轨迹
+            由式\eqref{equ2-15a}和\eqref{equ2-15b}计算得到，并利用式\eqref{equ2-13}推导出VRP轨迹，但最后一段利用插值所计算出的VRP轨迹超出了所在足跟和足尖的范围。
+            \begin{figure}[h] 
+                \centering
+                \includegraphics[scale=0.5]{DCM_HT.eps}
+                \caption{复现足跟-足尖支撑DCM轨迹规划图} \label{fig2-8}
+            \end{figure}
+    \subsection{DCM运动轨迹跟随控制}
+    
+
+
+
+
+
+
 
