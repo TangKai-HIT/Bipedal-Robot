@@ -1,6 +1,7 @@
 %使用宏
 %\usepackage{ctex}
 \usepackage{graphicx}
+\usepackage[total={6.5in,8.75in},top=1.2in, left=0.9in, includefoot]{geometry} %调整页边距
 \usepackage{amsmath}
 \usepackage{amssymb}
 \usepackage{booktabs} %三线表
@@ -10,6 +11,15 @@
 \usepackage{float}  %设置图片浮动位置的宏包
 \usepackage{subfig}  %插入多图时用子图显示的宏包
 \usepackage[section]{placeins} %控制浮动位置在本小节内
+\usepackage{listings} %source code printer
+\usepackage[framed,numbered,autolinebreaks,useliterate]{mcode} %matlab代码宏
+\usepackage[CJKbookmarks=true,colorlinks=true,linkcolor=blue]{hyperref} %超链接
+\usepackage{enumerate} %带序号枚举列表
+
+\newtheorem{definition}{\hspace{2em}定义}[section] %定义
+\newtheorem{theorem}{\hspace{2em}定理}[section] %定理
+\newtheorem{proof}{\hspace{2em}证明}[section] %证明
+
 \captionsetup{font={small}} %图题等字体大小
 \graphicspath{{figures/}} %图片的相对目录
 \bibliographystyle{unsrt} %参考文献排版样式
