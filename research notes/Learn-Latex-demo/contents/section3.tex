@@ -1,0 +1,19 @@
+\section{双足（人形）机器人接触动力学模型（Contact Dynamics）与相关约束}
+    本章将对机器人与外界物体刚体接触的物理模型进行讨论总结，很大一部分内容参考\href{https://scaron.info/category/robotics.html}{Stephane Caron的博客}
+    及他所做的研究\cite{caronLeveragingConeDouble2015,caronStabilitySurfaceContacts2015,caronMulticontactWalkingPattern2016},
+    这些内容对于增强优化机器人动力学规划时的可行性与稳定性至关重要。
+    \subsection{关于接触的基础理论与模型}
+        \subsubsection{接触模式（Contact Modes）}
+            根据Balkcom和Trinkle\cite{balkcomComputingWrenchCones2002}，不同的接触模式可以用其所约束的自由度数量定义。常见的几种接触模式如下（设约束自由度为DOC）：
+            \begin{enumerate}[（1）]
+                \item 断开：无接触（DOC=0）；
+                \item 滑动：与接触平面相对运动，伴随绕平面法向量的转动（DOC=3），无转动（DOC=4）；
+                \item 滚动：物体沿接触物的一条线滚动，物体可沿线平移（DOC-2），若物体不能沿线平移（DOC=3）；
+                \item 固定：完全约束（DOC=6）。
+            \end{enumerate}
+            不同接触模式中运动自由度与接触力自由度间存在互补关系，这一关系可以用螺旋理论（Screw Theory）中的reciprocal screws的概念来定义，其中速度twist系统的自由度
+            加上其对应reciprocal screws系统的自由度等于无约束时的运动自由度。
+
+            定义接触模式间的转换为接触切换（Contact Switches），当接触力越过其所在接触模式对应的力约束条件时发生接触切换，相当于离散的状态迁移，可以用对称矩阵表示。
+        \subsubsection{接触稳定性（Contact Stability）}
+            接触力
